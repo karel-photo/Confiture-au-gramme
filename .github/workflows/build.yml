@@ -1,1 +1,51 @@
+name: Construire l'APK Confiture
 
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Generer le projet Android
+        run: npx cap add android
+
+      - name: Copier l'appli web
+        run: npx cap sync android
+
+      - name: Ajouter permissions + icone alarme
+        run: node patch-android.mjs
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Installer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Compiler l'APK (debug)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: confiture-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
