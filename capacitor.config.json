@@ -1,0 +1,11 @@
+{
+  "appId": "com.confiture.app",
+  "appName": "Confiture",
+  "webDir": "www",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#b0324f"
+    }
+  }
+}
